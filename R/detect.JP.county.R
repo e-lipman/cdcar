@@ -38,14 +38,14 @@
 #'
 #' @export
 #'
-detect.JP.county <- function(dat = list(), window = 14){
+detect.JP.county <- function(dat = list(), window = 14, verbose=TRUE, show_plots=TRUE){
   cutoff = 3
   d = dat[, -(1:cutoff)]
   n.day = ncol(d)
   n = nrow(d)
   dates = as.Date(names(dat[, -(1:cutoff)]), "X%Y.%m.%d")
   dailynew = cbind(0, d[, -1] - d[, -n.day])
-
+  
   window1 = ceiling((window - 1)/2)
   window2 = window - window1 - 1
   dailynew.w = dailynew
@@ -70,10 +70,10 @@ detect.JP.county <- function(dat = list(), window = 14){
     indj = setdiff(start:end, j)
     dailynew.w[, j] = apply(dailynew[, indj], 1, mean)
   }
-
+  
   trun.scale = max(quantile(as.matrix(dailynew), probs = 0.965) + 1.5 *
-    (quantile(as.matrix(dailynew), probs = 0.965) -
-     quantile(as.matrix(dailynew), probs = 0.035)), 50)
+                     (quantile(as.matrix(dailynew), probs = 0.965) -
+                        quantile(as.matrix(dailynew), probs = 0.035)), 50)
   # tmp01 = as.matrix((dailynew - dailynew.w)^2/dailynew.w)
   # tmp02 = as.matrix((dailynew - dailynew.w)^2)
   tmp01 = as.matrix(dailynew/dailynew.w)
@@ -84,13 +84,13 @@ detect.JP.county <- function(dat = list(), window = 14){
   jumps = (tmp01 > thrd & dailynew > trun.scale)
   ind = which(jumps, arr.ind = TRUE)
   ind.all = ind
-
+ 
   for(i in 1:n){
     indi = matrix(ind[ind[, 1] == i,], ncol = 2)
     if(nrow(indi) > 3){
       ind.all = ind[ind[, 1] != i,]
     }
-    if(nrow(indi) > 0 & nrow(indi) < 10){
+    if(show_plots & nrow(indi) > 0 & nrow(indi) < 10){
       plot(dates, as.numeric(dailynew[i,]), type = "l", main = paste(dat[i, 2], ",", dat[i, 3]), ylab = "Daily Increases")
       for(j in 1:nrow(indi)){
         points(dates[indi[j, 2]], dailynew[i, indi[j, 2]], col = 2)
@@ -98,14 +98,17 @@ detect.JP.county <- function(dat = list(), window = 14){
       }
     }
   }
-
-  for(i in 1:nrow(ind.all)){
-    indi = ind.all[i,]
-    print(paste(dat[indi[1], 2], ",", dat[indi[1], 3], "jump on ", dates[indi[2]], "dailynew being", dailynew[indi[1], indi[2]]))
+  if (nrow(ind.all)>0){
+    for(i in 1:nrow(ind.all)){
+      indi = ind.all[i,]
+      if (verbose){     
+        print(paste(dat[indi[1], 2], ",", dat[indi[1], 3], "jump on ", dates[indi[2]], "dailynew being", dailynew[indi[1], indi[2]]))
+      }
+    }
   }
   n.JP = nrow(ind.all)
-  cat("# of jumps =", n.JP, "\n")
-
+  if (verbose) {cat("# of jumps =", n.JP, "\n") }
+  
   dat.new = d
   dat.new[ind.all] = NA
   names(dat.new) = dates

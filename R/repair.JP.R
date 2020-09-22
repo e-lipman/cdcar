@@ -29,12 +29,13 @@
 #'
 #' @export
 #'
-repair.JP <- function(dat.I.JP = list(), dat.D.JP = list(), dat.I = list(), dat.D = list(), level = "county", h = 7, date.start = as.Date("2020-03-01")){
+repair.JP <- function(dat.I.JP = list(), dat.D.JP = list(), dat.I = list(), dat.D = list(), level = "county", h = 7, 
+                          date.start = as.Date("2020-03-01"), show_plots = TRUE){
   if(level == "state"){
-    dat.rep = repair.JP.state(dat.I.JP, dat.D.JP, dat.I, dat.D, h, date.start)
+    dat.rep = repair.JP.state(dat.I.JP, dat.D.JP, dat.I, dat.D, h, date.start, show_plots)
   }
   if(level == "county"){
-    dat.rep = repair.JP.county(dat.I.JP, dat.D.JP, dat.I, dat.D, h, date.start)
+    dat.rep = repair.JP.county(dat.I.JP, dat.D.JP, dat.I, dat.D, h, date.start, show_plots)
   }
   return(dat.rep)
 }

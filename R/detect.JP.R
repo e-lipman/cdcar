@@ -38,11 +38,11 @@
 #'
 #' @export
 #'
-detect.JP <- function(dat = list(), window = 14, level = "county"){
+detect.JP <- function(dat = list(), window = 14, level = "county", verbose=TRUE, show_plots = TRUE){
   if(level == "state"){
-    res = detect.JP.state(dat = dat, window = window)
+    res = detect.JP.state(dat = dat, window = window, verbose, show_plots)
   }else{
-    res = detect.JP.county(dat = dat, window = window)
+    res = detect.JP.county(dat = dat, window = window, verbose, show_plots)
   }
   return(res)
 }
